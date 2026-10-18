@@ -1,0 +1,14 @@
+# Nix build outputs
+/result
+/result-*
+
+# Local-only secrets and environment files
+.env
+.env.*
+secrets/
+*.secret
+
+# Editor and OS files
+.DS_Store
+*.swp
+*~
