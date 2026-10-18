@@ -66,6 +66,15 @@
 
   services.openssh.enable = true;
 
+  # Serve PeerTube's canonical HTTPS hostname and proxy to its local HTTP port.
+  services.caddy = {
+    enable = true;
+    virtualHosts."peertube.ktrx.cards".extraConfig = ''
+      reverse_proxy 127.0.0.1:9000
+    '';
+  };
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
   fileSystems."/shared" = {
     device = "/dev/disk/by-uuid/9c4e390e-decb-4aa6-a50f-f6d6c05f62cd";
     fsType = "btrfs";

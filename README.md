@@ -28,6 +28,10 @@ sudo nixos-rebuild switch --flake /home/luke/nixos#zimaboard
 
 Review `git status` before committing, and never add secrets or application data. The host configuration imports its generated `hardware-configuration.nix`; review it carefully before changing partitioning or filesystem UUIDs.
 
+## PeerTube ingress
+
+Caddy serves `peertube.ktrx.cards` with automatic HTTPS and reverse-proxies to PeerTube on `127.0.0.1:9000`. The home router must forward TCP ports 80 and 443 to the ZimaBoard at `192.168.4.36`; public DNS/proxy settings must reach that origin. PeerTube RTMP uses TCP 1935 separately if livestream ingest is needed.
+
 ## Secrets and application data
 
 This repository is for operating-system configuration. Do not commit PeerTube environment files, credentials, SSH private/host keys, or application data. PeerTube's deployment and data currently live under `/DATA` and `/shared`, outside this repository.
