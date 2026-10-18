@@ -6,15 +6,27 @@ NixOS flake configuration for the ZimaBoard (`x86_64-linux`).
 
 - `zimaboard` — NixOS 26.05 on the 1 TB WD_BLACK NVMe.
 
-## Apply the configuration
+## Update the ZimaBoard
 
-From this repository on the ZimaBoard:
+Edit and push changes from the Mac checkout at `/Users/luketych/_/Dev/alpha/nixos`:
 
 ```sh
-sudo nixos-rebuild switch --flake .#zimaboard
+cd /Users/luketych/_/Dev/alpha/nixos
+nix flake check --no-build
+git status
+git add <changed-files>
+git commit -m "Describe the change"
+git push
+caffeinate -i rsync -a --no-owner --no-group --exclude='.git/' ./ luke@192.168.4.36:/home/luke/nixos/
 ```
 
-The host configuration imports its generated `hardware-configuration.nix`; review that file carefully before changing partitioning or filesystem UUIDs.
+Then, in a shell on the ZimaBoard, apply the synced checkout:
+
+```sh
+sudo nixos-rebuild switch --flake /home/luke/nixos#zimaboard
+```
+
+Review `git status` before committing, and never add secrets or application data. The host configuration imports its generated `hardware-configuration.nix`; review it carefully before changing partitioning or filesystem UUIDs.
 
 ## Secrets and application data
 
