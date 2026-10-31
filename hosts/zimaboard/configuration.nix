@@ -49,6 +49,10 @@
     ];
   };
 
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+  home-manager.users.luke = import ../../home/luke.nix;
+
   users.groups.sharedFiles = {
     gid = 1000;
     members = [ "luke" ];
