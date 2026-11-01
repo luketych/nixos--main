@@ -1,10 +1,15 @@
 source_dir="${CHEZMOI_SOURCE_DIR:-$HOME/.local/share/chezmoi/main_repo}"
-target="$HOME/.pi/agent"
+main_target="$HOME/.pi/agent"
+instance_targets=(
+  "$HOME/.pi/instances/plain"
+  "$HOME/.pi/instances/pi1"
+)
+targets=("$main_target" "${instance_targets[@]}")
 runtime_dir="${PI_MANAGED_RUNTIME_DIR:-$HOME/.local/share/pi-managed}"
 
 show_help() {
   cat <<'HELP'
-chezmoi-pi: inspect or apply only the Pi agent configuration
+chezmoi-pi: inspect or apply Pi configuration for main, plain, and pi1
 
 Usage:
   chezmoi-pi diff
@@ -13,15 +18,26 @@ Usage:
 Environment:
   CHEZMOI_SOURCE_DIR      Chezmoi source root (default: ~/.local/share/chezmoi/main_repo)
   PI_MANAGED_RUNTIME_DIR  Nix-managed Pi runtime (default: ~/.local/share/pi-managed)
+
+Notes:
+  apply covers the full managed main profile, not just settings.json.
+  Main settings are applied before instance settings. For missing instances,
+  review/apply main settings first: a combined diff uses the old on-disk baseline.
 HELP
 }
 
 require_source() {
-  if [ ! -d "$source_dir/private_dot_pi/private_agent" ]; then
-    printf 'error: Pi agent source files are missing at %s\n' "$source_dir" >&2
-    printf 'initialize it with: chezmoi --source %q init <dotfiles-repo>\n' "$source_dir" >&2
-    return 1
-  fi
+  local modifier
+  for modifier in \
+    private_dot_pi/private_agent/modify_settings.json \
+    private_dot_pi/instances/private_plain/modify_settings.json \
+    private_dot_pi/instances/private_pi1/modify_settings.json; do
+    if [ ! -f "$source_dir/$modifier" ]; then
+      printf 'error: coordinated Pi settings source is missing: %s\n' "$source_dir/$modifier" >&2
+      printf 'refresh the merged chezmoi source before inspecting or applying Pi profiles\n' >&2
+      return 1
+    fi
+  done
 }
 
 require_pi_runtime() {
@@ -48,12 +64,14 @@ case "$command_name" in
     ;;
   diff)
     require_source
-    chezmoi --source "$source_dir" diff --recursive "$target"
+    chezmoi --source "$source_dir" diff --recursive "${targets[@]}"
     ;;
   apply)
     require_source
     require_pi_runtime
-    chezmoi --source "$source_dir" apply "$target"
+    mkdir -p "${targets[@]}"
+    chezmoi --source "$source_dir" apply "$main_target"
+    chezmoi --source "$source_dir" apply "${instance_targets[@]}"
     ;;
   *)
     printf 'error: unknown command: %s\n\n' "$command_name" >&2
