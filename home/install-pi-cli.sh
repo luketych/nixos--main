@@ -12,7 +12,7 @@ version_key="$(printf '%s' "$PI_VERSION" | tr -c 'A-Za-z0-9._-' '_')"
 version_dir="$cli_root/$version_key"
 package_json="$version_dir/lib/node_modules/$PI_PACKAGE/package.json"
 version_bin="$version_dir/bin/pi"
-main_bin="$prefix/bin/pi0"
+main_bin="$prefix/bin/pi"
 
 package_version() {
   local package_file="$1"
@@ -53,7 +53,7 @@ if [ "$installed_version" != "$PI_VERSION" ] || [ ! -x "$version_bin" ]; then
 fi
 
 mkdir -p "$prefix/bin"
-main_tmp="$prefix/bin/.pi0.tmp.$$"
+main_tmp="$prefix/bin/.pi.tmp.$$"
 rm -f -- "$main_tmp"
 cat > "$main_tmp" <<EOF
 #!/usr/bin/env bash
@@ -67,7 +67,7 @@ EOF
 chmod 755 "$main_tmp"
 mv -f "$main_tmp" "$main_bin"
 
-# pi0 uses the full main profile. pi/plain stays sparse; pi1 inherits resources.
+# pi uses the full main profile. pi0 stays sparse; pi1 inherits resources.
 # Both isolated instances share login metadata and sessions with the main profile.
 write_instance_launcher() {
   local name="$1"
@@ -91,9 +91,9 @@ managed_packages="$managed_packages"
 
 mkdir -p "\$instance_dir"
 
-# Chezmoi owns plain settings. Do not seed main settings/resources into it, and
-# do not delete any resources that already exist in an older plain profile.
-if [ "$instance_name" != "plain" ]; then
+# pi0 is deliberately sparse: do not seed main settings/resources into it,
+# and preserve any settings/resources already present in this profile.
+if [ "$instance_name" = "pi1" ]; then
   if [ ! -e "\$instance_dir/settings.json" ] && [ ! -L "\$instance_dir/settings.json" ] && [ -r "\$main_dir/settings.json" ]; then
     cp -p "\$main_dir/settings.json" "\$instance_dir/settings.json"
   fi
@@ -216,5 +216,5 @@ EOF
   mv -f "$tmp" "$bin"
 }
 
-write_instance_launcher pi plain
+write_instance_launcher pi0 pi0
 write_instance_launcher pi1 pi1

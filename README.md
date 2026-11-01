@@ -42,22 +42,25 @@ CLI and runtime versions are declared in `home/luke.nix`. Home Manager puts
 
 | Command | Agent directory | Behavior |
 | --- | --- | --- |
-| `pi` | `~/.pi/instances/plain` | Plain profile; no main settings or resources are seeded by Nix |
-| `pi0` | `~/.pi/agent` | Full chezmoi-owned main profile |
+| `pi` | `~/.pi/agent` | Full chezmoi-owned main profile |
+| `pi0` | `~/.pi/instances/pi0` | Sparse isolated profile; main settings/resources are not seeded |
 | `pi1` | `~/.pi/instances/pi1` | Inherited resources and instance-specific preferences |
 
 Both instances share the main profile's login/model metadata and sessions.
 `pi1` fills missing settings keys from main without replacing instance overrides,
-and additionally enables `bigpowers` and `ponytail`. Existing plain-profile
-settings/resources and the former `~/.pi/instances/pi0` data are not deleted.
-Model preferences are owned by chezmoi, not hard-coded in these launchers.
+and additionally enables `bigpowers` and `ponytail`. Existing pi0 custom
+settings/resources are preserved, and the old `~/.pi/instances/plain` directory
+is unmanaged and left untouched. Model preferences are owned by chezmoi, not
+hard-coded in these launchers.
 
-Chezmoi owns the portable Pi configuration and the main/plain/pi1 settings.
-It is intentionally not initialized or applied by a NixOS rebuild. Use the merged
-chezmoi source containing all three settings modifiers (follow-up to
-[chezmoi PR #23](https://github.com/luketych/chezmoi-repo--main/pull/23) and
-[Mac launcher PR #48](https://github.com/luketych/nix-darwin--main/pull/48)). After
-arranging access to the private dotfiles repository, initialize its source:
+Chezmoi owns the portable Pi configuration and the main/pi0/pi1 settings.
+It is intentionally not initialized or applied by a NixOS rebuild. Use the
+coordinated corrective source containing the main, pi0, and pi1 modifiers. The
+earlier [chezmoi PR #23](https://github.com/luketych/chezmoi-repo--main/pull/23) and
+[Mac launcher PR #48](https://github.com/luketych/nix-darwin--main/pull/48)
+introduced the incorrect reversed/plain layout; they are historical context,
+not the desired mapping. Review the matching corrective PRs before activation.
+After arranging access to the private dotfiles repository, initialize its source:
 
 ```sh
 chezmoi --source ~/.local/share/chezmoi/main_repo init git@github.com:luketych/chezmoi-repo--main.git
@@ -73,17 +76,17 @@ settings in two phases, with the main settings and shared coder definition first
 
 ```sh
 source_dir="$HOME/.local/share/chezmoi/main_repo"
-mkdir -p "$HOME/.pi/agent/agents" "$HOME/.pi/instances/plain" "$HOME/.pi/instances/pi1"
+mkdir -p "$HOME/.pi/agent/agents" "$HOME/.pi/instances/pi0" "$HOME/.pi/instances/pi1"
 chezmoi --source "$source_dir" diff \
   "$HOME/.pi/agent/settings.json" "$HOME/.pi/agent/agents/coder.md"
 # Proceed only after reviewing the full diff.
 chezmoi --source "$source_dir" apply \
   "$HOME/.pi/agent/settings.json" "$HOME/.pi/agent/agents/coder.md"
 chezmoi --source "$source_dir" diff \
-  "$HOME/.pi/instances/plain/settings.json" "$HOME/.pi/instances/pi1/settings.json"
+  "$HOME/.pi/instances/pi0/settings.json" "$HOME/.pi/instances/pi1/settings.json"
 # Review this second diff against the updated on-disk main settings.
 chezmoi --source "$source_dir" apply \
-  "$HOME/.pi/instances/plain/settings.json" "$HOME/.pi/instances/pi1/settings.json"
+  "$HOME/.pi/instances/pi0/settings.json" "$HOME/.pi/instances/pi1/settings.json"
 ```
 
 The coordinated chezmoi defaults are `gpt-6-luna` / `medium`; the shared coder
@@ -99,9 +102,9 @@ Home Manager standalone from the ZimaBoard checkout:
 nix run github:nix-community/home-manager/release-26.05 -- switch --flake /home/luke/nixos#luke
 ```
 
-`chezmoi-pi diff` covers main/plain/pi1; `chezmoi-pi apply` checks the Nix-managed
+`chezmoi-pi diff` covers main/pi0/pi1; `chezmoi-pi apply` checks the Nix-managed
 runtime, creates target parents, applies the full managed main profile, then the
-plain/pi1 profiles. It is **not** a settings-only operation. For missing instances,
+pi0/pi1 profiles. It is **not** a settings-only operation. For missing instances,
 a combined diff can preview seeds from the old on-disk main baseline, whereas
 apply updates main first; use the explicit two-phase commands above instead.
 

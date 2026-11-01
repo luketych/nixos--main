@@ -76,7 +76,7 @@ class PiProfileTests(unittest.TestCase):
             [str(launcher), *args], env={**os.environ, "HOME": str(self.home)}, text=True
         ).strip()
 
-    def test_launchers_keep_plain_isolated_and_pi1_inherits_idempotently(self):
+    def test_launchers_route_main_pi0_sparse_and_pi1_inherits_idempotently(self):
         main = self.home / ".pi/agent"
         main.mkdir(parents=True)
         main_settings = {
@@ -97,39 +97,41 @@ class PiProfileTests(unittest.TestCase):
         (main / "sessions").mkdir()
         (main / "sessions/sentinel").write_text("session")
 
-        # Former pi0 mutable state and an unrelated old CLI tree are immutable.
-        former = self.home / ".pi/instances/pi0"
-        former.mkdir(parents=True)
-        (former / "settings.json").write_text("former pi0 settings")
-        (former / "sentinel").write_text("leave alone")
+        # Existing pi0 custom state and unmanaged legacy plain data are preserved.
+        pi0_dir = self.home / ".pi/instances/pi0"
+        pi0_dir.mkdir(parents=True)
+        (pi0_dir / "sentinel").write_text("leave alone")
+        plain_dir = self.home / ".pi/instances/plain"
+        plain_dir.mkdir(parents=True)
+        (plain_dir / "settings.json").write_text("legacy plain settings")
         old_tree = self.home / ".local/share/pi-managed/pi-cli/0.8.0/lib/node_modules/old"
         old_tree.mkdir(parents=True)
         (old_tree / "sentinel").write_text("old version")
         self.install()
 
         bin_dir = self.home / ".local/bin"
-        pi0, plain, pi1 = (bin_dir / name for name in ("pi0", "pi", "pi1"))
-        self.assertEqual(self.invoke(pi0, "--print-pi-env"), json.dumps({
+        pi, pi0, pi1 = (bin_dir / name for name in ("pi", "pi0", "pi1"))
+        self.assertEqual(self.invoke(pi, "--print-pi-env"), json.dumps({
             "PI_CODING_AGENT_DIR": str(main), "PI_CODING_AGENT_SESSION_DIR": "",
+            "PI_SUBAGENT_PI_COMMAND": str(pi),
+        }))
+        self.assertEqual(self.invoke(pi0, "--print-pi-env"), json.dumps({
+            "PI_CODING_AGENT_DIR": str(pi0_dir),
+            "PI_CODING_AGENT_SESSION_DIR": str(main / "sessions"),
             "PI_SUBAGENT_PI_COMMAND": str(pi0),
         }))
-        self.assertEqual(self.invoke(plain, "--print-pi-env"), json.dumps({
-            "PI_CODING_AGENT_DIR": str(self.home / ".pi/instances/plain"),
-            "PI_CODING_AGENT_SESSION_DIR": str(main / "sessions"),
-            "PI_SUBAGENT_PI_COMMAND": str(plain),
-        }))
 
-        plain_dir = self.home / ".pi/instances/plain"
-        self.assertFalse((plain_dir / "settings.json").exists(), "plain must not seed settings")
+        self.assertFalse((pi0_dir / "settings.json").exists(), "pi0 must not seed main settings")
+        self.assertFalse((pi0_dir / "agents").exists(), "pi0 must not seed main resources")
         seeded_resources = ("agents", "prompts", "extensions", "skills", "themes",
                             "APPEND_SYSTEM.md", "SYSTEM.md", "resource-groups",
                             "system-templates", "pi-vcc-config.json")
-        self.assertTrue(all(not (plain_dir / item).exists() for item in seeded_resources))
-        self.assertEqual((plain_dir / "auth.json").resolve(), (main / "auth.json").resolve())
-        self.assertEqual((plain_dir / "models-store.json").resolve(), (main / "models-store.json").resolve())
-        existing_plain = {"defaultModel": "plain-model", "packages": ["npm:plain"], "custom": True}
+        self.assertTrue(all(not (pi0_dir / item).exists() for item in seeded_resources))
+        self.assertEqual((pi0_dir / "auth.json").resolve(), (main / "auth.json").resolve())
+        self.assertEqual((pi0_dir / "models-store.json").resolve(), (main / "models-store.json").resolve())
+        existing_pi0 = {"defaultModel": "pi0-model", "packages": ["npm:pi0"], "custom": True}
         for item in seeded_resources:
-            path = plain_dir / item
+            path = pi0_dir / item
             if item == "agents":
                 path.mkdir()
                 (path / "custom.md").write_text("custom agent")
@@ -138,11 +140,12 @@ class PiProfileTests(unittest.TestCase):
                 (path / "custom").write_text("custom")
             else:
                 path.write_text("custom")
-        (plain_dir / "settings.json").write_text(json.dumps(existing_plain) + "\n")
-        self.invoke(plain, "--version")
-        self.assertEqual(json.loads((plain_dir / "settings.json").read_text()), existing_plain)
+        (pi0_dir / "settings.json").write_text(json.dumps(existing_pi0) + "\n")
+        self.invoke(pi0, "--version")
+        self.assertEqual(json.loads((pi0_dir / "settings.json").read_text()), existing_pi0)
         for item in seeded_resources:
-            self.assertTrue((plain_dir / item).exists(), f"plain removed existing {item}")
+            self.assertTrue((pi0_dir / item).exists(), f"pi0 removed existing {item}")
+        self.assertEqual((plain_dir / "settings.json").read_text(), "legacy plain settings")
 
         pi1_dir = self.home / ".pi/instances/pi1"
         pi1_dir.mkdir(parents=True)
@@ -162,8 +165,7 @@ class PiProfileTests(unittest.TestCase):
         self.assertEqual((customization / "custom.md").read_text(), "user-owned agent")
         self.assertEqual((pi1_dir / "auth.json").resolve(), (main / "auth.json").resolve())
         self.assertEqual((pi1_dir / "models-store.json").resolve(), (main / "models-store.json").resolve())
-        self.assertEqual((former / "settings.json").read_text(), "former pi0 settings")
-        self.assertEqual((former / "sentinel").read_text(), "leave alone")
+        self.assertEqual((pi0_dir / "sentinel").read_text(), "leave alone")
         self.assertEqual((old_tree / "sentinel").read_text(), "old version")
         self.assertEqual((main / "auth.json").read_text(), '{"synthetic":true}\n')
         self.assertEqual((main / "models-store.json").read_text(), '{"synthetic":true}\n')
@@ -191,7 +193,7 @@ class PiProfileTests(unittest.TestCase):
         source = self.root / "source"
         for relative in (
             "private_dot_pi/private_agent/modify_settings.json",
-            "private_dot_pi/instances/private_plain/modify_settings.json",
+            "private_dot_pi/instances/private_pi0/modify_settings.json",
             "private_dot_pi/instances/private_pi1/modify_settings.json",
         ):
             path = source / relative
@@ -228,7 +230,7 @@ class PiProfileTests(unittest.TestCase):
         self.assertEqual(diff.returncode, 0, diff.stderr)
         diff_calls = [json.loads(line) for line in log.read_text().splitlines()]
         expected_targets = [str(self.home / ".pi/agent"),
-                            str(self.home / ".pi/instances/plain"),
+                            str(self.home / ".pi/instances/pi0"),
                             str(self.home / ".pi/instances/pi1")]
         self.assertEqual(diff_calls, [["--source", str(source), "diff", "--recursive", *expected_targets]])
         log.write_text("")
@@ -242,13 +244,13 @@ class PiProfileTests(unittest.TestCase):
         self.assertTrue(all(Path(target).is_dir() for target in expected_targets))
 
         log.write_text("")
-        (source / "private_dot_pi/instances/private_plain/modify_settings.json").unlink()
+        (source / "private_dot_pi/instances/private_pi0/modify_settings.json").unlink()
         for command in ("diff", "apply"):
             rejected = self.run_chezmoi_pi(command, source, runtime, fake_bin, log)
             self.assertNotEqual(rejected.returncode, 0)
             self.assertEqual(log.read_text(), "", "outdated source must fail before invoking chezmoi")
 
-        (source / "private_dot_pi/instances/private_plain/modify_settings.json").write_text("{}\n")
+        (source / "private_dot_pi/instances/private_pi0/modify_settings.json").write_text("{}\n")
         manifest_path = runtime / "manifest.json"
         manifest = json.loads(manifest_path.read_text())
         manifest["extensions"]["pi-vcc"]["version"] = "0.0.0"
@@ -267,7 +269,7 @@ class PiProfileTests(unittest.TestCase):
         reviewed_source = Path(reviewed_source)
         allowed = {
             "private_dot_pi/private_agent/modify_settings.json": "private_dot_pi/private_agent/modify_settings.json",
-            "private_dot_pi/instances/private_plain/modify_settings.json": "private_dot_pi/instances/private_plain/modify_settings.json",
+            "private_dot_pi/instances/private_pi0/modify_settings.json": "private_dot_pi/instances/private_pi0/modify_settings.json",
             "private_dot_pi/instances/private_pi1/modify_settings.json": "private_dot_pi/instances/private_pi1/modify_settings.json",
             "private_dot_pi/private_agent/agents/coder.md": "private_dot_pi/private_agent/agents/coder.md",
         }
@@ -291,13 +293,13 @@ class PiProfileTests(unittest.TestCase):
         }))
 
         main = self.home / ".pi/agent"
-        plain = self.home / ".pi/instances/plain"
+        pi0 = self.home / ".pi/instances/pi0"
         pi1 = self.home / ".pi/instances/pi1"
         settings_fixtures = {
             main: {"defaultProvider": "openai-codex", "defaultModel": "user-main",
                    "defaultThinkingLevel": "high", "theme": "solarized", "packages": ["npm:user-main"]},
-            plain: {"defaultProvider": "openai-codex", "defaultModel": "user-plain",
-                    "defaultThinkingLevel": "high", "customPlain": True, "packages": ["npm:user-plain"]},
+            pi0: {"defaultProvider": "openai-codex", "defaultModel": "user-pi0",
+                  "defaultThinkingLevel": "high", "customPi0": True, "packages": ["npm:user-pi0"]},
             pi1: {"defaultProvider": "openai-codex", "defaultModel": "user-pi1",
                   "defaultThinkingLevel": "high", "customPi1": True, "packages": ["npm:user-pi1"]},
         }
@@ -308,7 +310,7 @@ class PiProfileTests(unittest.TestCase):
             main / "auth.json": '{"synthetic":"auth"}\n',
             main / "models-store.json": '{"synthetic":"models"}\n',
             main / "sessions/sentinel": "synthetic session\n",
-            plain / "auth.json": '{"synthetic":"plain"}\n',
+            pi0 / "auth.json": '{"synthetic":"pi0"}\n',
             pi1 / "sessions/sentinel": "synthetic pi1 session\n",
         }
         for path, contents in sentinels.items():
@@ -338,7 +340,7 @@ class PiProfileTests(unittest.TestCase):
                    "idleNotify": {"enabled": False},
                    "packages": ["npm:user-main", "npm:@latentminds/pi-quotas",
                                 "npm:@heyhuynhgiabuu/pi-pretty", "git:github.com/luketych/pi-idle-notify"]},
-            plain: {**settings_fixtures[plain], "defaultModel": "gpt-6-luna", "defaultThinkingLevel": "medium"},
+            pi0: {**settings_fixtures[pi0], "defaultModel": "gpt-6-luna", "defaultThinkingLevel": "medium"},
             pi1: {**settings_fixtures[pi1], "defaultModel": "gpt-6-luna", "defaultThinkingLevel": "medium"},
         }
         snapshots = {}

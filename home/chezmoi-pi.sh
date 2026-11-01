@@ -1,7 +1,7 @@
 source_dir="${CHEZMOI_SOURCE_DIR:-$HOME/.local/share/chezmoi/main_repo}"
 main_target="$HOME/.pi/agent"
 instance_targets=(
-  "$HOME/.pi/instances/plain"
+  "$HOME/.pi/instances/pi0"
   "$HOME/.pi/instances/pi1"
 )
 targets=("$main_target" "${instance_targets[@]}")
@@ -9,7 +9,7 @@ runtime_dir="${PI_MANAGED_RUNTIME_DIR:-$HOME/.local/share/pi-managed}"
 
 show_help() {
   cat <<'HELP'
-chezmoi-pi: inspect or apply Pi configuration for main, plain, and pi1
+chezmoi-pi: inspect or apply Pi configuration for main, pi0, and pi1
 
 Usage:
   chezmoi-pi diff
@@ -30,7 +30,7 @@ require_source() {
   local modifier
   for modifier in \
     private_dot_pi/private_agent/modify_settings.json \
-    private_dot_pi/instances/private_plain/modify_settings.json \
+    private_dot_pi/instances/private_pi0/modify_settings.json \
     private_dot_pi/instances/private_pi1/modify_settings.json; do
     if [ ! -f "$source_dir/$modifier" ]; then
       printf 'error: coordinated Pi settings source is missing: %s\n' "$source_dir/$modifier" >&2
