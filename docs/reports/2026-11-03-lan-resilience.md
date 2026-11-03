@@ -277,7 +277,7 @@ python3 -m scripts.network_resilience \
 ```
 
 Disruptive commands and safeguards are in the
-[operator guide](../network-resilience-tests.md). No additional live tests,
+[operator guide](../hosts/zimaboard/network-resilience-tests.md). No additional live tests,
 router changes, system switches, or monitoring deployments were run to write
 this report.
 

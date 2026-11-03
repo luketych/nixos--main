@@ -19,7 +19,7 @@ Repeated complete groups, physical cable/router tests, watchdog execution,
 static tests, and generation rollback have not been validated live. Console
 access remains a prerequisite.
 
-The dated [LAN investigation report](reports/2026-11-03-lan-resilience.md)
+The dated [LAN investigation report](../../reports/2026-11-03-lan-resilience.md)
 records the observations, current theories, proof limits, and escalation paths.
 
 ## Test phases

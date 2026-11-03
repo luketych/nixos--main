@@ -21,7 +21,7 @@ filename. The file does not have to be named `Caddyfile`. NixOS also overrides
 
 | Layer | Where to look |
 | --- | --- |
-| Desired configuration / source of truth | [`services.caddy` in `hosts/zimaboard/configuration.nix`](../hosts/zimaboard/configuration.nix): public hostname and `reverse_proxy 127.0.0.1:9000`. |
+| Desired configuration / source of truth | [`services.caddy` in `hosts/zimaboard/configuration.nix`](../../hosts/zimaboard/configuration.nix): public hostname and `reverse_proxy 127.0.0.1:9000`. |
 | Generated config | `/etc/caddy/caddy_config` → `/etc/static/caddy/caddy_config` → a generated file in `/nix/store/`. |
 | Packaged unit and NixOS override | `systemctl cat caddy --no-pager` shows the base unit **and** drop-ins; an empty `ExecStart=` resets the packaged command before its replacement. |
 | Loaded systemd command | `systemctl show caddy -p ExecStart -p ExecReload -p DropInPaths` shows the effective settings, not just the base unit. |
@@ -130,9 +130,9 @@ process** used `/etc/caddy/caddy_config --adapter caddyfile`; the missing
 `/etc/caddy/Caddyfile` was not the fault. Local and LAN HTTPS checks returned 200
 with certificate verification passing, while the public URL returned Cloudflare
 523. These are dated observations, **not** a claim of current public availability
-or a diagnosed cause. See the [public-ingress report](reports/2026-11-03-peertube-ingress.md)
+or a diagnosed cause. See the [public-ingress report](../reports/2026-11-03-peertube-ingress.md)
 for the evidence, uncertainty, and WAN comparison.
 
 **Later resolution:** Luke reported that opening the port restored public access.
-See [known issues and resolutions](known_issues.md) for the fix, its evidence
+See [known issues and resolutions](../known_issues.md) for the fix, its evidence
 limits, and recurrence checks; the linked investigation report predates this fix.

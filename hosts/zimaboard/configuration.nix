@@ -76,7 +76,7 @@
   # NixOS generates /etc/caddy/caddy_config and overrides the upstream unit's
   # /etc/caddy/Caddyfile path. Inspect the effective unit, not just its first page:
   # systemctl show caddy -p ExecStart -p ExecReload -p DropInPaths
-  # Source of truth is this declaration; see docs/peertube-ingress.md for diagnosis.
+  # Source of truth is this declaration; see docs/services/peertube-ingress.md for diagnosis.
   services.caddy = {
     enable = true;
     virtualHosts."peertube.ktrx.cards".extraConfig = ''

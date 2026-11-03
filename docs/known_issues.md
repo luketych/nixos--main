@@ -79,7 +79,7 @@ the generated `/etc/caddy/` files or `/nix/store/` paths.
    network. Record the exact rule change and result; verify playback separately.
    Do not disable TLS verification or broadly open additional ports.
 
-See the [Caddy/ingress troubleshooting guide](peertube-ingress.md) for bounded,
+See the [Caddy/ingress troubleshooting guide](services/peertube-ingress.md) for bounded,
 read-only diagnostic commands. The [original ingress report](reports/2026-11-03-peertube-ingress.md)
 preserves the pre-fix observations and uncertainty; its open-investigation status
 predates the operator-reported resolution recorded here.
