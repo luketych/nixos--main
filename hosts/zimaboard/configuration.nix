@@ -1,13 +1,15 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ./networking.nix
+  ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   time.timeZone = "America/Vancouver";
@@ -71,6 +73,10 @@
   services.openssh.enable = true;
 
   # Serve PeerTube's canonical HTTPS hostname and proxy to its local HTTP port.
+  # NixOS generates /etc/caddy/caddy_config and overrides the upstream unit's
+  # /etc/caddy/Caddyfile path. Inspect the effective unit, not just its first page:
+  # systemctl show caddy -p ExecStart -p ExecReload -p DropInPaths
+  # Source of truth is this declaration; see docs/peertube-ingress.md for diagnosis.
   services.caddy = {
     enable = true;
     virtualHosts."peertube.ktrx.cards".extraConfig = ''

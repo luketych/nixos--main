@@ -8,6 +8,11 @@
 secrets/
 *.secret
 
+# Local Python caches and network-test reports
+__pycache__/
+*.py[cod]
+/network-test-reports/
+
 # Editor and OS files
 .DS_Store
 *.swp

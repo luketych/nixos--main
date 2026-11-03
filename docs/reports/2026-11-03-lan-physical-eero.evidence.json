@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "title": "ZimaBoard LAN physical cable and eero reboot follow-up",
+  "report_date_utc": "2026-11-03",
+  "events": [
+    {
+      "test": "physical_cable_disconnect_and_reconnect",
+      "source": "operator report",
+      "description": "Operator reported unplugging and reconnecting the existing cable to the same port; exact disconnect duration and timestamps were not instrumented."
+    },
+    {
+      "test": "eero_reboot",
+      "source": "operator report",
+      "description": "Operator reported rebooting eero; gateway identity, exact timestamps, path outage, and DHCP negotiation were not independently recorded."
+    }
+  ],
+  "artifacts": [
+    {
+      "source_file": "zimaboard-physical-test-baseline.json",
+      "sha256": "bf958016283d232635e58df2769b718732612d63c5074922196c0a06d9311794",
+      "mtime_utc": "2026-11-03T16:05:37.575665+00:00",
+      "test": "zimaboard-physical-test-baseline",
+      "host": "192.168.4.66",
+      "status": "verified",
+      "expected_ip": "192.168.4.66",
+      "observed_ip": "192.168.4.66",
+      "interface": "enp2s0",
+      "mac": "00:e0:4c:5b:96:3e",
+      "ipv4_method": "auto",
+      "services": "active",
+      "dns": "verified",
+      "peertube": "verified"
+    },
+    {
+      "source_file": "zimaboard-physical-cable-after.json",
+      "sha256": "bf958016283d232635e58df2769b718732612d63c5074922196c0a06d9311794",
+      "mtime_utc": "2026-11-03T16:09:18.960351+00:00",
+      "test": "zimaboard-physical-cable-after",
+      "host": "192.168.4.66",
+      "status": "verified",
+      "expected_ip": "192.168.4.66",
+      "observed_ip": "192.168.4.66",
+      "interface": "enp2s0",
+      "mac": "00:e0:4c:5b:96:3e",
+      "ipv4_method": "auto",
+      "services": "active",
+      "dns": "verified",
+      "peertube": "verified"
+    },
+    {
+      "source_file": "zimaboard-eero-reboot-after.json",
+      "sha256": "bf958016283d232635e58df2769b718732612d63c5074922196c0a06d9311794",
+      "mtime_utc": "2026-11-03T19:36:13.066568+00:00",
+      "test": "zimaboard-eero-reboot-after",
+      "host": "192.168.4.66",
+      "status": "verified",
+      "expected_ip": "192.168.4.66",
+      "observed_ip": "192.168.4.66",
+      "interface": "enp2s0",
+      "mac": "00:e0:4c:5b:96:3e",
+      "ipv4_method": "auto",
+      "services": "active",
+      "dns": "verified",
+      "peertube": "verified"
+    },
+    {
+      "source_file": "zimaboard-ssh-sample-20261103.json",
+      "sha256": "51607265df77595e32b8803e24a094ec90830b6558f4fafcc6c6296656f0a548",
+      "mtime_utc": "2026-11-03T19:37:07.078948+00:00",
+      "test": "twenty_independent_ssh_connections",
+      "host": "192.168.4.66",
+      "started_utc": "2026-11-03T19:36:23.448519+00:00",
+      "finished_utc": "2026-11-03T19:37:07.078571+00:00",
+      "attempt_count": 20,
+      "successes": 20,
+      "failures": 0,
+      "latency_seconds": {
+        "min": 0.198,
+        "median": 0.231,
+        "max": 0.808
+      }
+    }
+  ],
+  "limitations": [
+    "Report mtimes are artifact timestamps, not disturbance timestamps.",
+    "Health reports are point-in-time baseline results, not continuous traces; identical JSON hashes can represent distinct observations.",
+    "Twenty connection attempts are a short single-client sample, not a long-term reliability estimate.",
+    "The 24-hour SSH monitor was still running when this evidence summary was written and is not included as a completed result.",
+    "PeerTube checks reached only the board's local HTTP endpoint; no external DNS, TLS, forwarding, or playback is proven."
+  ]
+}

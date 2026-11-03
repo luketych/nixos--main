@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "report_date_utc": "2026-11-03",
+  "repository": "https://github.com/luketych/nixos",
+  "branch": "feat/zimaboard-static-lan",
+  "base_commit": "9911a233f671595287661af71def9116761a33c2",
+  "source_state": "Report-time source files are staged/uncommitted; fingerprints do not identify the source bytes used for every earlier test run.",
+  "source_fingerprints_sha256": {
+    "scripts/network_resilience/harness.py": "26a0d35aa44a204f99ba17f40044f6c76a5ad362bc4edb3dd1200d153d8bf2cf",
+    "tests/test_network_resilience.py": "511a577337c7a86eb63793ce314abc13ceae3fa6b7762a7845bddc83d23d9f34",
+    "hosts/zimaboard/networking.nix": "ccbe896d415987892ec3da8216981dfe6b1facfd060e203bf394c777ed521adc",
+    "tests/test_zimaboard_networking.py": "e71fbcf7f03215bba199a552de776d93e1bb7fcef3237cc99e718f1257396170"
+  },
+  "live_snapshot": {
+    "observed_at_utc": "2026-11-03T06:56:40Z",
+    "nixos_version": "26.05.20261015.26f4107 (Yarara)",
+    "interface": "enp2s0",
+    "mac": "00:e0:4c:5b:96:3e",
+    "ipv4_address": "192.168.4.66/22",
+    "ipv4_method": "auto",
+    "connection_id": "Wired connection 2",
+    "connection_uuid": "0e4ea8c2-74ea-34a9-80fe-a80251d38aa2",
+    "gateway": "192.168.4.1",
+    "dns_servers": [
+      "192.168.4.1"
+    ],
+    "dhcp_server_identifier": "192.168.4.1",
+    "dhcp_client_identifier": "01:00:e0:4c:5b:96:3e",
+    "observed_lease_seconds": 14400,
+    "active_system": "/nix/store/ivjgkkh79vwqvi7gj2v44r48jmyhfz80-nixos-system-nixos-26.05.20261015.26f4107",
+    "services": {
+      "NetworkManager": "active",
+      "sshd": "active",
+      "caddy": "active"
+    },
+    "pending_resilience_timers": 0,
+    "prepared_static_profiles_present": false
+  },
+  "records": [
+    {
+      "source_file": "zimaboard-job-plumbing.json",
+      "original_local_path": "/tmp/zimaboard-job-plumbing.json",
+      "sha256": "df059a582794a5e79be46f255a9aea8e08634bd53a04f70eae05947753dfbd6d",
+      "mtime_utc": "2026-11-03T06:31:08.442269+00:00",
+      "host": "192.168.4.66",
+      "suite": "dhcp",
+      "status": "verified",
+      "run_id": "4075e6d961",
+      "baseline": {
+        "expected_ip": "192.168.4.66",
+        "observed_ip": "192.168.4.66",
+        "interface": "enp2s0",
+        "mac": "00:e0:4c:5b:96:3e",
+        "ipv4_method": "auto",
+        "services": "active",
+        "dns": "verified",
+        "peertube": "verified"
+      },
+      "outcome": {
+        "case": "job-plumbing",
+        "status": "verified",
+        "unit": "dhcp-resilience-4075e6d961-job-plumbing-01",
+        "ip": "192.168.4.66",
+        "network_changed": false,
+        "watchdog": "cancelled"
+      },
+      "recovery_state": "cancelled",
+      "operator_acknowledgements": {
+        "reservation_confirmed": "acknowledged",
+        "console_available": "acknowledged_not_tested",
+        "reboot_allowed": "not_applicable",
+        "system_switch_allowed": "not_applicable"
+      }
+    },
+    {
+      "source_file": "zimaboard-dhcp-reconnect.json",
+      "original_local_path": "/tmp/zimaboard-dhcp-reconnect.json",
+      "sha256": "3035e9735908dafecf60e3a50df80f1a6bf560f41b47786cad6c189d82e0b514",
+      "mtime_utc": "2026-11-03T06:36:10.626910+00:00",
+      "host": "192.168.4.66",
+      "suite": "dhcp",
+      "status": "verified",
+      "run_id": "ab4796f852",
+      "baseline": {
+        "expected_ip": "192.168.4.66",
+        "observed_ip": "192.168.4.66",
+        "interface": "enp2s0",
+        "mac": "00:e0:4c:5b:96:3e",
+        "ipv4_method": "auto",
+        "services": "active",
+        "dns": "verified",
+        "peertube": "verified"
+      },
+      "outcome": {
+        "case": "reconnect",
+        "status": "verified",
+        "unit": "dhcp-resilience-ab4796f852-reconnect-01",
+        "ip": "192.168.4.66",
+        "network_changed": true,
+        "watchdog": "cancelled"
+      },
+      "recovery_state": "cancelled",
+      "operator_acknowledgements": {
+        "reservation_confirmed": "acknowledged",
+        "console_available": "acknowledged_not_tested",
+        "reboot_allowed": "not_applicable",
+        "system_switch_allowed": "not_applicable"
+      }
+    },
+    {
+      "source_file": "zimaboard-networkmanager-restart.json",
+      "original_local_path": "/tmp/zimaboard-networkmanager-restart.json",
+      "sha256": "09fd3f976d59fc7527b1cdd4f7db3da8e763a0a3106698deaf9caa815f034d39",
+      "mtime_utc": "2026-11-03T06:37:31.222087+00:00",
+      "host": "192.168.4.66",
+      "suite": "dhcp",
+      "status": "verified",
+      "run_id": "46b93b98f0",
+      "baseline": {
+        "expected_ip": "192.168.4.66",
+        "observed_ip": "192.168.4.66",
+        "interface": "enp2s0",
+        "mac": "00:e0:4c:5b:96:3e",
+        "ipv4_method": "auto",
+        "services": "active",
+        "dns": "verified",
+        "peertube": "verified"
+      },
+      "outcome": {
+        "case": "restart-networkmanager",
+        "status": "verified",
+        "unit": "dhcp-resilience-46b93b98f0-restart-networkmanager-01",
+        "ip": "192.168.4.66",
+        "network_changed": true,
+        "watchdog": "cancelled"
+      },
+      "recovery_state": "cancelled",
+      "operator_acknowledgements": {
+        "reservation_confirmed": "acknowledged",
+        "console_available": "acknowledged_not_tested",
+        "reboot_allowed": "not_applicable",
+        "system_switch_allowed": "not_applicable"
+      }
+    },
+    {
+      "source_file": "zimaboard-link-bounce.json",
+      "original_local_path": "/tmp/zimaboard-link-bounce.json",
+      "sha256": "29ceaf3782f9c08a1c37384bcdeddca3217f3fdbd6e23645547e7f82e7947af9",
+      "mtime_utc": "2026-11-03T06:46:18.513994+00:00",
+      "host": "192.168.4.66",
+      "suite": "dhcp",
+      "status": "verified",
+      "run_id": "ab4eee9bfb",
+      "baseline": {
+        "expected_ip": "192.168.4.66",
+        "observed_ip": "192.168.4.66",
+        "interface": "enp2s0",
+        "mac": "00:e0:4c:5b:96:3e",
+        "ipv4_method": "auto",
+        "services": "active",
+        "dns": "verified",
+        "peertube": "verified"
+      },
+      "outcome": {
+        "case": "link-bounce",
+        "status": "verified",
+        "unit": "dhcp-resilience-ab4eee9bfb-link-bounce-01",
+        "ip": "192.168.4.66",
+        "network_changed": true,
+        "watchdog": "cancelled"
+      },
+      "recovery_state": "cancelled",
+      "operator_acknowledgements": {
+        "reservation_confirmed": "acknowledged",
+        "console_available": "acknowledged_not_tested",
+        "reboot_allowed": "not_applicable",
+        "system_switch_allowed": "not_applicable"
+      }
+    },
+    {
+      "source_file": "zimaboard-reboot.json",
+      "original_local_path": "/tmp/zimaboard-reboot.json",
+      "sha256": "d8d242019e44245e7d2bcfdc6e515b7053124e35988ab7e7363f719a296486d6",
+      "mtime_utc": "2026-11-03T06:49:09.037017+00:00",
+      "host": "192.168.4.66",
+      "suite": "dhcp",
+      "status": "verified",
+      "run_id": "9a7ca9f851",
+      "baseline": {
+        "expected_ip": "192.168.4.66",
+        "observed_ip": "192.168.4.66",
+        "interface": "enp2s0",
+        "mac": "00:e0:4c:5b:96:3e",
+        "ipv4_method": "auto",
+        "services": "active",
+        "dns": "verified",
+        "peertube": "verified"
+      },
+      "outcome": {
+        "case": "reboot",
+        "status": "verified",
+        "unit": "dhcp-resilience-9a7ca9f851-reboot-01",
+        "reboot_verified": true,
+        "recovery": "no_timer_survives_reboot"
+      },
+      "recovery_state": "not_available_reboot",
+      "operator_acknowledgements": {
+        "reservation_confirmed": "acknowledged",
+        "console_available": "acknowledged_not_tested",
+        "reboot_allowed": "acknowledged",
+        "system_switch_allowed": "not_applicable"
+      }
+    }
+  ],
+  "limitations": [
+    "Source report mtimes are artifact timestamps, not exact fault times or downtime measurements.",
+    "Each source is the latest successful report at that path; earlier failed reports were overwritten and are not reconstructed here.",
+    "Reports retain baseline and case summaries, not complete post-action probes or raw boot IDs.",
+    "Most non-reboot disturbances explicitly reactivate the captured profile; these are assisted recovery tests.",
+    "Watchdogs were cancelled, not demonstrated performing successful automatic recovery.",
+    "Router reservation and console availability are operator acknowledgements, not independent machine-verification.",
+    "No credentials, SSH keys, trust-store contents, Pi sessions, environment dumps, or raw journals are included."
+  ]
+}

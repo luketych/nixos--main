@@ -17,8 +17,10 @@ git status
 git add <changed-files>
 git commit -m "Describe the change"
 git push
-# Use the board's current SSH address; DHCP addresses can change.
-caffeinate -i rsync -a --no-owner --no-group --exclude='.git/' ./ luke@192.168.4.75:/home/luke/nixos/
+# Enter the live address (.66 is currently verified via DHCP reservation).
+printf 'Current ZimaBoard IP: '
+read -r ZIMABOARD_IP
+caffeinate -i rsync -a --no-owner --no-group --exclude='.git/' ./ "luke@${ZIMABOARD_IP:?Enter the current IP}:/home/luke/nixos/"
 ```
 
 Then, in a shell on the ZimaBoard, apply the synced checkout:
@@ -28,6 +30,42 @@ sudo nixos-rebuild switch --flake /home/luke/nixos#zimaboard
 ```
 
 Review `git status` before committing, and never add secrets or application data. The host configuration imports its generated `hardware-configuration.nix`; review it carefully before changing partitioning or filesystem UUIDs.
+
+## Static LAN networking
+
+The default configuration keeps NetworkManager DHCP and relies on the eero
+reservation. `hosts/zimaboard/networking.nix` also defines an **opt-in,
+disabled-by-default** static configuration for `192.168.4.66/22` on MAC
+`00:e0:4c:5b:96:3e`. When explicitly enabled, it provides a preferred static
+profile, a manual DHCP recovery profile, and a spare-port management rule.
+Without that opt-in, it declares none of those settings or profiles.
+
+The live address is `192.168.4.66` via DHCP. The prepared static profiles have
+not been activated: having `.66` does not by itself mean IPv4 is configured
+manually. Before opting in to static addressing, verify the reservation, check
+for address conflicts, review the system-generation diff, and arrange recovery
+access. See
+[`docs/networking.md`](docs/networking.md) for provenance, build-only checks,
+and the console-assisted test/rollback procedure. Do not run an unattended
+remote system switch for the first cutover.
+
+### Network resilience test group
+
+The opt-in controller in `scripts/network_resilience/` runs from the Mac. Its
+smoke mode is read-only; DHCP/static fault injection, reboot, and whole-system
+rollback tests require explicit selection and safety acknowledgements. Start
+with a non-disruptive check of the board's current DHCP address (the SSH
+`zimaboard` alias must reference its already-trusted host key):
+
+```sh
+python3 -m scripts.network_resilience --host 192.168.4.66 --host-key-alias zimaboard
+```
+
+See [`docs/network-resilience-tests.md`](docs/network-resilience-tests.md) for
+separate DHCP/static phases, reports, watchdog behavior, and manual checks that
+cannot be automated. Fault injection is not part of normal unittest discovery.
+The [2026-11-03 investigation report](docs/reports/2026-11-03-lan-resilience.md)
+records live results, evidence limits, operating expectations, and follow-up options.
 
 ## Chezmoi and Pi coding agent
 
@@ -149,8 +187,16 @@ routing/settings wiring, not the complete Pi SDK or provider connectivity.
 
 Caddy serves `peertube.ktrx.cards` with automatic HTTPS and reverse-proxies to
 PeerTube on `127.0.0.1:9000`. The home router must forward TCP ports 80 and 443
-to the ZimaBoard at `192.168.4.73`; public DNS/proxy settings must reach that
-origin. PeerTube RTMP uses TCP 1935 separately if livestream ingest is needed.
+to the ZimaBoard's active LAN address (currently `192.168.4.66` via DHCP);
+public DNS/proxy settings must reach that origin. NixOS does not update the eero
+reservation or port forwards. PeerTube RTMP uses TCP 1935 separately if
+livestream ingest is needed.
+
+**Troubleshooting:** NixOS generates `/etc/caddy/caddy_config` and overrides the
+packaged unit's `/etc/caddy/Caddyfile` command. A missing `Caddyfile` is not by
+itself an error. See [Caddy configuration and public-ingress diagnosis](docs/peertube-ingress.md)
+for the source of truth, effective-unit inspection, and checks that distinguish
+local Caddy health from Cloudflare/router reachability.
 
 ## Secrets and application data
 
