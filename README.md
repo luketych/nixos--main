@@ -17,6 +17,7 @@ This is one deployable Git repository: the host configuration, Home Manager prof
 ## Host
 
 - `zimaboard` — NixOS 26.05 on the 1 TB WD_BLACK NVMe.
+- Tunarr runs in Docker at `http://<zimaboard-ip>:8000`; persistent app data is stored in `/var/lib/tunarr`.
 - The live LAN address `192.168.4.66` currently comes from DHCP and the eero reservation. The prepared static NetworkManager profile is opt-in and has not been activated.
 - Caddy serves PeerTube at `peertube.ktrx.cards` and proxies to `127.0.0.1:9000`.
 
@@ -37,6 +38,7 @@ A normal NixOS rebuild also activates the integrated Home Manager profile. Revie
 - [Opt-in network resilience tests](docs/hosts/zimaboard/network-resilience-tests.md)
 - [Pi CLI and chezmoi profile](docs/home/pi-cli.md)
 - [PeerTube ingress diagnosis](docs/services/peertube-ingress.md)
+- [Tunarr deployment](docs/services/tunarr.md)
 - [Known issues and resolutions](docs/known_issues.md)
 - [Dated reports and evidence](docs/reports/)
 
