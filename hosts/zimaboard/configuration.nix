@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix
+    ./desktop-composition.nix
   ];
 
   boot.loader.systemd-boot.enable = true;

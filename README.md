@@ -7,6 +7,7 @@ NixOS flake configuration for the ZimaBoard (`x86_64-linux`), with an integrated
 ```text
 hosts/zimaboard/          host NixOS configuration and hardware-specific modules
 home/                     Luke's Home Manager profile and local installers
+scripts/nixos_cli.py      ZimaBoard-local rebuild and desktop composition CLI
 scripts/network_resilience/  Mac-side network checks and opt-in fault testing
 tests/                    Python regression and Nix evaluation tests
 docs/                     host, service, home-profile, and investigation guidance
@@ -22,7 +23,7 @@ This is one deployable Git repository: the host configuration, Home Manager prof
 
 ## Deploy and validate
 
-Start with the [ZimaBoard update procedure](docs/hosts/zimaboard/update.md). Run the static check from the repository root:
+Start with the [ZimaBoard update procedure](docs/hosts/zimaboard/update.md). Run `nixos_cli` on the ZimaBoard to rebuild locally and optionally add Sway, Niri, or Hyprland alongside KDE. Run the static check from the repository root:
 
 ```sh
 nix flake check --no-build
