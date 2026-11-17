@@ -122,7 +122,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Manage the ZimaBoard's local NixOS configuration.")
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--run", "--apply-current", action="store_true", help="Confirm and rebuild with the active selection (default: none).")
-    action.add_argument("--window-manager", nargs="?", choices=MANAGERS, const="list", action="append",
+    action.add_argument("--window-manager", nargs="?", choices=MANAGERS, action="append",
                         metavar="MANAGER", help="List choices, or confirm and switch to one manager.")
     action.add_argument("--status", action="store_true", help="Show the active generation's composition.")
     action.add_argument("--log", action="store_true", help="Print rebuild-attempt history (JSON Lines, oldest first).")
@@ -130,7 +130,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.window_manager and len(args.window_manager) != 1:
         parser.error("--window-manager may only be supplied once")
-    if args.window_manager == ["list"]:
+    if args.window_manager == [None]:
         print(" ".join(MANAGERS))
         return 0
     if not any(vars(args).values()):
