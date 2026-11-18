@@ -8,7 +8,7 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, home-manager, ... }: {
+  outputs = { self, nixpkgs, home-manager, ... }: {
     homeConfigurations.luke = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       modules = [ ./home/luke.nix ];
@@ -19,6 +19,7 @@
       modules = [
         home-manager.nixosModules.home-manager
         ./hosts/zimaboard/configuration.nix
+        { system.configurationRevision = self.rev or self.dirtyRev or null; }
       ];
     };
   };
