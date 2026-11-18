@@ -64,6 +64,22 @@
   programs.firefox.enable = true;
 
   virtualisation.docker.enable = true;
+  virtualisation.oci-containers.backend = "docker";
+  virtualisation.oci-containers.containers.tunarr = {
+    image = "chrisbenincasa/tunarr:latest";
+    autoStart = true;
+    ports = [ "8000:8000" ];
+    environment = {
+      TZ = config.time.timeZone;
+    };
+    volumes = [
+      "/var/lib/tunarr:/config/tunarr"
+      "/shared/tunarr-media:/media:ro"
+    ];
+  };
+  systemd.tmpfiles.rules = [ "d /shared/tunarr-media 0755 root root -" ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8000 ];
+
   environment.systemPackages = with pkgs; [
     docker-compose
     git
@@ -84,7 +100,6 @@
       reverse_proxy 127.0.0.1:9000
     '';
   };
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   fileSystems."/shared" = {
     device = "/dev/disk/by-uuid/9c4e390e-decb-4aa6-a50f-f6d6c05f62cd";
